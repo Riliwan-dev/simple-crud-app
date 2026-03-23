@@ -5,15 +5,25 @@ const UserSchema = mongoose.Schema(
     username: {
       type: String,
       required: [true, "Please enter a username"],
+      trim: true,        // Removes accidental spaces like " Riliwan "
+      minLength: [3, "Username must be at least 3 characters"],
+      maxLength: [20, "Username cannot exceed 20 characters"]
     },
     email: {
       type: String,
       required: [true, "Please enter an email"],
-      unique: true, // This prevents two people from using the same email
+      unique: true,
+      lowercase: true,   // Automatically converts "Bello@Email.com" to "bello@email.com"
+      trim: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 
+        "Please enter a valid email address" 
+      ] // This Regex checks for the @ and the .com
     },
     age: {
       type: Number,
-      required: false,
+      min: [0, "Age cannot be negative"],
+      max: [120, "Please enter a valid age"],
       default: 0,
     },
   },
@@ -22,7 +32,5 @@ const UserSchema = mongoose.Schema(
   }
 );
 
-// We turn the Schema into a Model named "User"
 const User = mongoose.model("User", UserSchema);
-
 module.exports = User;

@@ -1,23 +1,40 @@
-require('dotenv').config(); // 1. Load the environment variables
+require('dotenv').config(); 
 const express = require('express');
 const mongoose = require('mongoose');
+const User = require('./src/models/userModel.js'); // Import your blueprint
+
 const app = express();
 
-// Middleware to parse JSON (Useful for CRUD later)
+// Middleware (This is the "Translator" for Postman)
 app.use(express.json());
 
+// --- ROUTES START HERE ---
+
+// Basic Home Route
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
-// 2. Use the PORT from .env
+// CREATE: The Route to add a new user
+app.post('/api/users', async (req, res) => {
+    try {
+        const user = await User.create(req.body); 
+        res.status(201).json(user); 
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// --- ROUTES END HERE ---
+
 const PORT = process.env.PORT || 3000;
 
-// 3. Connect to the database using the variable
+// Connect to the database
 mongoose.connect(process.env.DATABASE_URL)
   .then(() => {
     console.log('Connected to Database!');
-    // It is best practice to start the server ONLY after the DB connects
+    
+    // Start the server ONLY after the DB connects
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
